@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { Expenses } from './src/types/types';
 
 const app = express();
 const port = 4000;
@@ -9,7 +10,8 @@ app.get('/', (_req: Request, res: Response) => {
     res.send('Hello World!');
 });
 
-let expenses = [
+let expenses:Expenses[]= [
+    
     {
         id: 1,
         description: 'Groceries',
