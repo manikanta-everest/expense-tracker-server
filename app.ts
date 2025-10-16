@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { Expenses } from './src/types/types';
+import { addExpense, deleteExpense, getExpenses, updateExpense } from './src/services/service';
 
 const app = express();
 const port = 4000;
@@ -10,8 +11,7 @@ app.get('/', (_req: Request, res: Response) => {
     res.send('Hello World!');
 });
 
-let expenses:Expenses[]= [
-    
+let expenses: Expenses[] = [
     {
         id: 1,
         description: 'Groceries',
@@ -35,21 +35,15 @@ let expenses:Expenses[]= [
     },
 ]
 
-app.get('/expenses', (_req: Request, res: Response) => {
+app.get('/expenses', async (_req: Request, res: Response) => {
+    const expenses = await getExpenses();
     res.status(200).send(expenses);
 });
 
 app.post('/expenses', async (req: Request, res: Response) => {
     try {
-        const newId = expenses.length ? expenses[expenses.length - 1].id + 1 : 1;
-        expenses = [
-            ...expenses,
-            {
-                id: newId,
-                ...req.body
-            }
-        ]
-        res.status(201).send(expenses);
+        const expense = await addExpense(req.body);
+        res.status(201).send(expense);
     } catch (error) {
         res.status(500).json({ error: 'Failed to create expense' });
     }
@@ -58,21 +52,7 @@ app.post('/expenses', async (req: Request, res: Response) => {
 app.patch('/expenses/:id', async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.id);
-        const isExists = expenses.some(expense => expense.id === id);
-
-        if (!isExists) {
-            return res.status(404).json({ error: `Expense with id ${id} not found` });
-        }
-
-        expenses = expenses.map((item) => {
-            if (item.id === id) {
-                return {
-                    ...item,
-                    ...req.body
-                }
-            }
-            return item;
-        })
+        await updateExpense(id, req.body);
         res.status(200).json({ message: `Updated expense with id: ${id}` });
     } catch (error) {
         res.status(500).json({ error: 'Failed to update expense' });
@@ -82,13 +62,7 @@ app.patch('/expenses/:id', async (req: Request, res: Response) => {
 app.delete('/expenses/:id', async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.id);
-        const isExists = expenses.some(expense => expense.id === id);
-
-        if (!isExists) {
-            return res.status(404).json({ error: `Expense with id ${id} not found` });
-        }
-
-        expenses = expenses.filter((item) => item.id !== id)
+        await deleteExpense(id);
         res.status(200).json({ message: `Deleted expense with id: ${id}` });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete expense' });
