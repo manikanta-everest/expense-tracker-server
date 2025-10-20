@@ -1,6 +1,6 @@
 
-export type Expenses = {
-    id: number,
+export type Expense = {
+    id: string,
     description: string,
     amount: number,
     category: string,

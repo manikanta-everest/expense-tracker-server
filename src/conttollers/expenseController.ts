@@ -21,7 +21,12 @@ export const addExpense = async (req: Request, res: Response, next: NextFunction
 
 export const updateExpense = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
+    const doc = await expenseService.getById(id);
+    if (!doc.exists) {
+      res.status(404).json({ message: 'expense not found' });
+      return;
+    }
     const updated = await expenseService.updateExpense(id, req.body);
     res.status(200).json(updated);
   } catch (error) {
@@ -31,8 +36,13 @@ export const updateExpense = async (req: Request, res: Response, next: NextFunct
 
 export const deleteExpense = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = parseInt(req.params.id);
-    const result = await expenseService.deleteExpense(id);
+    const id = req.params.id;
+    const doc = await expenseService.getById(id);
+    if (!doc.exists) {
+      res.status(404).json({ message: 'expense not found' });
+      return;
+    }
+    const result = await expenseService.deleteExpense(req.params.id);
     res.status(200).json(result);
   } catch (error) {
     next(error);
