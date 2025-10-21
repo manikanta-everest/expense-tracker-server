@@ -1,0 +1,36 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15
+    environment:
+      POSTGRES_DB: expense-tracker
+      POSTGRES_USER: expense-tracker
+      POSTGRES_PASSWORD: expense@12345
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U expense-tracker"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build: .
+    container_name: expense-tracker-server
+    ports:
+      - "4000:4000"
+    environment:
+      DB_NAME: expense-tracker
+      DB_USER: expense-tracker
+      DB_PASSWORD: expense@12345
+      DB_HOST: postgres
+      DB_PORT: 5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
