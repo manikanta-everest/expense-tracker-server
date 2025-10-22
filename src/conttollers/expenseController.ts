@@ -22,8 +22,8 @@ export const addExpense = async (req: Request, res: Response, next: NextFunction
 export const updateExpense = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = req.params.id;
-    const doc = await expenseService.getById(id);
-    if (!doc.exists) {
+    const expense = await expenseService.getById(id);
+    if (!expense) {
       res.status(404).json({ message: 'expense not found' });
       return;
     }
@@ -37,8 +37,8 @@ export const updateExpense = async (req: Request, res: Response, next: NextFunct
 export const deleteExpense = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = req.params.id;
-    const doc = await expenseService.getById(id);
-    if (!doc.exists) {
+    const expense = await expenseService.getById(id);
+    if (!expense) {
       res.status(404).json({ message: 'expense not found' });
       return;
     }

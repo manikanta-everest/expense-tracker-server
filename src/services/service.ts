@@ -1,34 +1,36 @@
 
-import { db } from "../firebase/firebase";
-import { Expense } from "../types/types";
+import { Expense as ExpenseType } from "../types/types";
+import { Expense } from '../models/Expense';
 
 export const getExpenses = async () => {
-    const allexpenses = await db.collection('expenses').get();
-    const data = allexpenses.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
-    return data
-
-};
-export const addExpense = async (expense: Omit<Expense, 'id'>) => {
-    const docRef = db.collection('expenses').doc();
-    await docRef.set(expense);
-    return { id: docRef.id, ...expense };
+  const expenses = await Expense.findAll();
+  return expenses;
 };
 
-export const updateExpense = async (id: string, updates: Partial<Expense>) => {
-    await db.collection('expenses').doc(id).update(updates);
-    return { id, ...updates };
+export const addExpense = async (expense: Omit<ExpenseType, 'id'>) => {
+    console.log('expense', expense);
+  const newExpense = await Expense.create(expense);
+  return newExpense;
 };
 
-export const deleteExpense = async (id: string) => {
-    await db.collection('expenses').doc(id).delete();
-    return { message: `Expense ${id} deleted` };
+export const updateExpense = async (id: number, updates: Partial<ExpenseType>) => {
+  const expense = await getById(id);
+  if (!expense) return null;
+  await expense.update(updates);
+  return expense;
 };
 
-export const getById = async (id: string) => {
-    const expenseRef = db.collection('expenses').doc(id);
-    const doc = await expenseRef.get();
-    return doc;
-}
+export const deleteExpense = async (id: number) => {
+  const expense = await getById(id);
+  if (!expense) return null;
+  await expense.destroy();
+  return { message: 'Deleted successfully' };
+};
+
+export const getById = async (id: number) => {
+  const expense = await Expense.findByPk(id);
+  return expense;
+};
 
 const services = {
     getExpenses,
