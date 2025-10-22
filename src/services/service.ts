@@ -13,21 +13,21 @@ export const addExpense = async (expense: Omit<ExpenseType, 'id'>) => {
   return newExpense;
 };
 
-export const updateExpense = async (id: string, updates: Partial<ExpenseType>) => {
+export const updateExpense = async (id: number, updates: Partial<ExpenseType>) => {
   const expense = await getById(id);
   if (!expense) return null;
   await expense.update(updates);
   return expense;
 };
 
-export const deleteExpense = async (id: string) => {
+export const deleteExpense = async (id: number) => {
   const expense = await getById(id);
   if (!expense) return null;
   await expense.destroy();
   return { message: 'Deleted successfully' };
 };
 
-export const getById = async (id: string) => {
+export const getById = async (id: number) => {
   const expense = await Expense.findByPk(id);
   return expense;
 };
